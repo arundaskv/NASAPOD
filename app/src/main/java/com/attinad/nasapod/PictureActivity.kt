@@ -1,40 +1,115 @@
 package com.attinad.nasapod
 
-import android.content.Intent
+import android.app.job.JobInfo
+import android.app.job.JobScheduler
+import android.content.ComponentName
+import android.content.Context
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.view.View
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_picture.*
-import android.app.ActivityManager
-import android.content.Context
-import android.os.Binder
-import android.app.AlarmManager
-import android.app.PendingIntent
-import android.app.job.JobInfo
-import android.content.ComponentName
-import android.app.job.JobScheduler
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.uiThread
+import org.jsoup.Jsoup
+import java.net.URL
+
+
 class PictureActivity : AppCompatActivity() {
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_picture)
 
-        val jobScheduler = getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
-        jobScheduler.schedule(
-                JobInfo.Builder(1, ComponentName(this, WallpaperService::class.java!!))
-                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
-                .setPeriodic(3000)
-                .build()
-        )
 
-        val urlUtil = NASAUrlUtility();
-        val url = urlUtil.getImageUrlFromNASAPage();
-        Picasso.with(this)
-                .load(url)
-                .into(nasapod);
+        //JobUtil().scheduleJob(this);
 
-        val wallpaperUtility = WallpaperUtility();
-        wallpaperUtility.setAsDefaultWallpaper(this,url);
+        val today_date = PODMemory().getToayDate()
+        val isDataAvail = PODMemory().checkIfDataExist(this,today_date)
+        if(isDataAvail){
+            val podObj = PODMemory().getPodData(this,today_date)
+            updateUI(podObj)
+        }else{
+            progressBar.visibility = View.VISIBLE
+            fetchDataFromWeb()
+        }
+
+
+    }
+
+    private fun fetchDataFromWeb(){
+        doAsync {
+            val url = URL("https://apod.nasa.gov/apod/astropix.html")
+            val document = Jsoup.parse(url, 5000)
+            val imageElement = document.select("img").first()
+            val imageUrl = imageElement.absUrl("src")  //image url
+            val explanation = StringBuilder()
+            val paragraphs = document.select("p")
+            val aboutPod = StringBuilder()
+            val datePod = StringBuilder()
+            var count = 0
+            var isFinished = false;
+            for (p in paragraphs){
+                if(!isFinished){
+                    if(count == 0){
+                        aboutPod.append(p.text());
+                    }else if(count == 1){
+                        datePod.append(p.text());
+                    }else{
+                        if(p.text().startsWith("Tomorrow's picture:"))
+                            isFinished = true
+
+                        else if(!p.text().startsWith("Authors & editors:")){
+                            explanation.append(p.text());
+                        }
+
+                    }
+                    count+=1
+                }
+            }
+
+
+            val podTitleelement = document.select("b").first()
+            val podTitle  = podTitleelement.text()
+            val podObj = PoDObject(aboutPod.toString(),imageUrl,podTitle,datePod.toString(),explanation.toString())
+            PODMemory().saveInfo(applicationContext,datePod.toString(),podObj)
+            uiThread {
+                updateUI(podObj)
+            }
+
+
+        }
+
+    }
+
+    private fun updateUI(podObj: PoDObject?) {
+
+            try {
+
+                titleTxt.text = "Astronomy Picture of the Day"
+                aboutPodTxt.text = podObj!!.podAbout
+                datePodTxt.text = podObj!!.podDate
+
+                Picasso.with(applicationContext)
+                        .load(podObj!!.podUrl)
+                        .into(nasapod,object : com.squareup.picasso.Callback {
+                            override fun onSuccess() {
+                                progressBar.visibility = View.GONE
+                            }
+
+                            override fun onError() {
+
+                            }
+                        })
+                titlePodTxt.text = podObj!!.podTitle
+                imageDescription.text = podObj!!.podDescription;
+            } catch (ex: NullPointerException) {
+                ex.printStackTrace()
+            }
+
+
+
     }
 
 }

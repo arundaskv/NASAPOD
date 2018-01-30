@@ -6,9 +6,97 @@
     android:layout_height="match_parent"
     tools:context="com.attinad.nasapod.PictureActivity">
 
-    <ImageView
-        android:id="@+id/nasapod"
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+
+
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="10dp"/>
+        android:layout_marginBottom="5dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="10dp"
+        >
+
+     <TextView
+         android:id="@+id/titleTxt"
+         android:layout_alignParentTop="true"
+         android:layout_width="match_parent"
+         android:layout_height="30dp"
+         android:gravity="center"
+         android:textColor="@color/blackDark"
+         android:textSize="@dimen/title_text_size"
+         android:layout_marginBottom="10dp"
+         android:text=""/>
+
+        <TextView
+            android:id="@+id/aboutPodTxt"
+            android:layout_below="@+id/titleTxt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center|left"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="10dp"
+            android:textColor="@color/blackLight"
+            android:textSize="@dimen/small_text_size"
+            android:text=""/>
+        
+    <ImageView
+        android:layout_below="@+id/aboutPodTxt"
+        android:id="@+id/nasapod"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/rounded_edge"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        />
+        <TextView
+            android:id="@+id/titlePodTxt"
+            android:layout_below="@+id/nasapod"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:textStyle="bold"
+            android:gravity="center|left"
+            android:textColor="@color/blackLight"
+            android:textSize="@dimen/normal_text_size"
+            android:layout_marginTop="10dp"
+            android:text=""/>
+        <TextView
+            android:id="@+id/datePodTxt"
+            android:layout_below="@+id/titlePodTxt"
+            android:layout_width="match_parent"
+            android:layout_height="15dp"
+            android:gravity="center|left"
+            android:textColor="@color/blackLight"
+            android:layout_marginBottom="10dp"
+            android:textSize="@dimen/small_text_size"
+            android:text=""/>
+        <TextView
+            android:id="@+id/imageDescription"
+            android:layout_below="@+id/datePodTxt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center|left"
+            android:textColor="@color/blackLight"
+            android:textSize="@dimen/small_text_size"
+            android:text=""
+            android:layout_marginBottom="30dp"/>
+
+    </RelativeLayout>
+    </ScrollView>
+
+    <ProgressBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/progressBar"
+        android:visibility="visible"
+        android:layout_gravity="center"
+
+        />
+    </FrameLayout>
 </android.support.constraint.ConstraintLayout>

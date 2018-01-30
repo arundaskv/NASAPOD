@@ -27,7 +27,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".PictureActivity"></activity>
+        <activity android:name=".PictureActivity"
+            android:label="Picture Of Today"
+            >
+
+        </activity>
     </application>
 
 </manifest>

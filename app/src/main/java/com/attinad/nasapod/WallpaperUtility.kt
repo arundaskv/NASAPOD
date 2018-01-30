@@ -11,18 +11,24 @@ import java.io.IOException
  * Created by Arun.Das on 22-11-2017.
  */
 class WallpaperUtility {
-
-    fun setAsDefaultWallpaper (context : Context, url : String)= {
+    fun setAsDefaultWallpaper (mContext : Context, url : String) {
         doAsync {
-            val result = Picasso.with(context).load(url).get()
-            val wallpaperManager = WallpaperManager.getInstance(context)
-            uiThread {
-                try {
-                    wallpaperManager.setBitmap(result)
-                } catch (ex: IOException) {
-                    ex.printStackTrace()
+            try{
+                val result = Picasso.with(mContext)
+                        .load(url)
+                        .get()
+                val wallpaperManager = WallpaperManager.getInstance(mContext)
+                uiThread {
+                    try {
+                        wallpaperManager.setBitmap(result)
+                    } catch (ex: IOException) {
+                        ex.printStackTrace()
+                    }
                 }
+            }catch (ex: Exception) {
+                ex.printStackTrace()
             }
+
         }
     }
 
